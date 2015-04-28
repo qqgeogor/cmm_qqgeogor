@@ -49,7 +49,7 @@ from PIL import Image
 #minibatch_img = T.tensor4(name = 'minibatch_img')  
   
 #-------------img1---------------  
-img1 = Image.open(open('20140515202416843.png'))  
+img1 = Image.open(open('03_avatar_middle.jpg'))  
 width1,height1 = img1.size  
 img1 = numpy.asarray(img1, dtype = 'float32')/256. # (height, width, 3)  
   
@@ -58,7 +58,7 @@ img1_rgb = img1.swapaxes(0,2).swapaxes(1,2).reshape(1,3,height1,width1) #(3,heig
   
   
 #-------------img2---------------  
-img2 = Image.open(open('20140515202416843.png'))  
+img2 = Image.open(open('03_avatar_middle.jpg'))  
 width2,height2 = img2.size  
 img2 = numpy.asarray(img2,dtype = 'float32')/256.  
 img2_rgb = img2.swapaxes(0,2).swapaxes(1,2).reshape(1,3,height2,width2) #(3,height,width)  
