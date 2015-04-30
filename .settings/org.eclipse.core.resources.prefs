@@ -1,2 +1,5 @@
 eclipse.preferences.version=1
 encoding//cmm/cmm.py=utf-8
+encoding//cmm/mlp_someone.py=utf-8
+encoding//cmm/pca.py=utf8
+encoding//myann/bp.py=utf8
