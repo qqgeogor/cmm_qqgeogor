@@ -51,7 +51,7 @@ def softmax(inMatrix):
     outMatrix=numpy.mat(numpy.zeros((m,n)))  
     soft_sum=0  
     for idx in range(0,n):  
-        outMatrix[0,idx] = math.exp(inMatrix[0,idx])  
+        outMatrix[0,idx] = numpy.exp(inMatrix[0,idx])  
         soft_sum += outMatrix[0,idx]  
     for idx in range(0,n):  
         outMatrix[0,idx] /= soft_sum  
@@ -134,7 +134,7 @@ def loadMNISTlabels(absFilePathandName,datanum=60000):
     
 class MultiLayerNetwork(object):
     
-    def __init__(self, inputCount, hiddenLayerCount, nodesInHiddenLayers, outputCount, maxIter=100,errorFunc = softmax,errorSumFunc = softmaxErrorSum,trainDataNum=200):
+    def __init__(self, inputCount, hiddenLayerCount, nodesInHiddenLayers, outputCount, maxIter=100,errorFunc = softmax,errorSumFunc = softmaxErrorSum,trainDataNum=200,recurrent=False):
         self.trainDataNum = trainDataNum
         self.decayRate = 0.2  
         self.punishFactor = 0.05  # 惩罚系数
@@ -206,10 +206,11 @@ class MultiLayerNetwork(object):
         
         Atemp.append(Ztemp[self.numberOfLayers-2])
         errorMat = self.errorFunc(Atemp[self.numberOfLayers-2])
-        errorMat=softmax(Atemp[self.numberOfLayers-2]) 
+        #errorMat2=softmax(Atemp[self.numberOfLayers-2]) 
         #print errorMat
         errorsum=self.errorSumFunc(errorMat,self.trainlabel,currentDataIdx)
-        #errorsum = -1.0*math.log(errorMat[0,int(self.trainlabel[currentDataIdx])])
+        #errorsum2 = -1.0*math.log(errorMat[0,int(self.trainlabel[currentDataIdx])])
+        #print 'errorsum',errorMat==errorMat2
         return Atemp,Ztemp,errorsum
     
     #最终输出的的结果与样本的差值
@@ -227,6 +228,7 @@ class MultiLayerNetwork(object):
         Theta=[]  
         outlabels=numpy.mat(numpy.zeros((1,self.outputCount)))  
         outlabels[0,int(self.trainlabel[currentDataIdx])]=1.0
+        
         #开始计算残差
         thetaNl=self.calThetaNl(Atemp[self.numberOfLayers-2], outlabels, Ztemp[self.numberOfLayers-2])
         Theta.append(thetaNl)  
@@ -347,6 +349,7 @@ class MultiLayerNetwork(object):
             #计算一个初始状态
             cDetaW,cDetaB,cError=self.backwardPropogation(self.traindata[0],0)
             #更新迭代
+            #print "iteration : %d"%iter_idx
             for idx in range(1,self.trainDataNum):  
                 DetaWtemp,DetaBtemp,Errortemp=self.backwardPropogation(self.traindata[idx],idx)  
                 cError += Errortemp  
@@ -359,8 +362,8 @@ class MultiLayerNetwork(object):
                     cDetaB[idx_B] += DetaBtemp[idx_B]    
             cError/=self.trainDataNum  
             cError += self.calpunish()  
-            print "old error",Error_old  
-            print "new error",cError  
+            #print "old error",Error_old  
+            #print "new error",cError  
             Error_new=cError  
             if Error_old-Error_new < self.eps:  
                 break  
@@ -379,7 +382,7 @@ class MultiLayerNetwork(object):
         for idx in range(0,self.trainDataNum):  
             Atemp,Ztemp,errorsum=self.forwardPropogation(self.traindata[idx],idx)  
             TrainPredict=softmax(Atemp[self.numberOfLayers-2])  
-            #print TrainPredict  
+            print TrainPredict  
             Plist=TrainPredict.tolist()  
             LabelPredict=Plist[0].index(max(Plist[0]))  
             print "LabelPredict",LabelPredict  
@@ -392,13 +395,13 @@ class MultiLayerNetwork(object):
     
 
 if __name__ == "__main__":
-    network=MultiLayerNetwork(784, 1, [256], 10, maxIter=200)
+    network=MultiLayerNetwork(784, 1, [50], 10, maxIter=200)
     network.initWeight()
     #print network.weightMatrix
     network.printWeightMatrix()
     network.loadtraindata("C:\\Users\\qq\\Documents\\data mining\\mmnist\\train-images.idx3-ubyte")
     network.loadtrainlabel("C:\\Users\\qq\\Documents\\data mining\\mmnist\\train-labels.idx1-ubyte")
-    network.trainwithMultiThread()
+    network.train()
     network.getTrainAccuracy()
     
 
